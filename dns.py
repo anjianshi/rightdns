@@ -1,23 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import socket
-import re
-import os
 import sys
 from threading import Thread
 
+import config
+
+# 运行时加 -d 参数能获得更详细的输出信息
 debug = "-d" in sys.argv
-
-port = 9992
-
-normal_dns = ('220.189.127.106', 53)
-blocked_dns = ('safe dns server', 5353)
-
-with open(os.path.dirname(os.path.realpath(__file__)) + "/blocked_domains.txt") as f:
-    block_domain_patterns = [
-        pattern.strip()
-        for pattern in f.read().split("\n") if len(pattern.strip()) and pattern.strip()[0] != "#"
-    ]
 
 
 # =========================================
@@ -32,33 +22,39 @@ def _async(f):
 
 @_async
 def handle_request(content, address, server_socket):
-    match = re.search(r'(\w|-)+([^\w\-](\w|-)+)+', content)
-    if match:
-        domain = re.search(r'(\w|-)+([^\w\-](\w|-)+)+', content).group()
-        domain = re.sub(r'[^\w\-]', '.', domain)
+    fake_req = udp_send((config.fake_dns_ip, 53), content)
+    try:
+        fake_req.settimeout(config.poisoning_response_delay / 1000.0)
+        fake_resp = fake_req.recv(1024)
+        if debug:
+            print("got poisoned result", content, fake_resp)
+        poisoned = True
+    except socket.timeout:
+        poisoned = False
 
-        blocked = False
-        for pattern in block_domain_patterns:
-            if re.search(pattern, domain):
-                blocked = True
-                break
-    else:
-        print("can't extract domain", content)
-        domain = "empty"
-        blocked = False
+    req = udp_send(
+        (config.safe_dns_ip, config.safe_dns_port) if poisoned else (config.normal_dns_ip, config.normal_dns_port),
+        content
+    )
+    resp = req.recv(2048)
+    server_socket.sendto(resp, address)
+    print('handled ' + ('poisoned' if poisoned else 'normal') + ' domain', resp)
 
+
+def udp_send(target, content):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(content, blocked_dns if blocked else normal_dns)
-    server_socket.sendto(s.recv(1024), address)
-    print("handled", domain, 'blocked' if blocked else 'normal', address)
+    s.sendto(content, target)
+    return s
 
+
+# ===========================================
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(('0.0.0.0', port))
-print("listening UDP on {}".format(port))
+server_socket.bind(('0.0.0.0', config.port))
+print("listening DNS request on {}".format(config.port))
 
 while True:
-    content, address = server_socket.recvfrom(1024)
+    content, address = server_socket.recvfrom(2048)
     if debug:
         print("received: ", content, address)
     handle_request(content, address, server_socket)
