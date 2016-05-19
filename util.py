@@ -6,6 +6,7 @@ import re
 import string
 import binascii
 import sys
+import datetime
 
 
 def _async(f):
@@ -54,7 +55,7 @@ class Logger:
 
         # handle chars like \x01
         msg = "".join(c if c in printset else '\\x' + binascii.b2a_hex(c) for c in msg)
-        log_content = "[{}] {}\n".format(level, msg)
+        log_content = "[{}][{}] {}\n".format(level, datetime.datetime.now().strftime("%m-%d %H:%M:%S %f"), msg)
 
         self.logfile.write(log_content)
         if level == ERROR:
