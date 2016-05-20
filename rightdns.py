@@ -14,7 +14,7 @@ import config
 
 base = os.path.dirname(os.path.abspath(__file__))
 
-logger = Logger(base + "/dns.log", not config.debug)
+logger = Logger(base + "/dns.log", not config.debug, config.log_buffer_size)
 
 
 class DNSDaemon(Daemon):

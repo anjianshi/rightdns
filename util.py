@@ -45,8 +45,8 @@ printset = set(string.printable) - set(["\t", "\r", "\n", "\x0b", "\x0c"])
 
 
 class Logger:
-    def __init__(self, log_file_path, ignore_debug=True):
-        self.logfile = open(log_file_path, "a")
+    def __init__(self, log_file_path, ignore_debug=True, buffer_size=0):
+        self.logfile = open(log_file_path, "a", buffer_size)
         self.ignore_debug = ignore_debug
 
     def _log(self, msg, level):
@@ -71,3 +71,6 @@ class Logger:
 
     def error(self, msg):
         self._log(msg, ERROR)
+
+    def flush(self):
+        self.logfile.flush()
