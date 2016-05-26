@@ -23,5 +23,7 @@ fake_response_delay = 100
 # 设为 -1 或 0 则为不限制（非常不建议这样做）
 resolve_timeout = 3000
 
+# 日志文件地址。设为 None 即不记录日志（在路由器等存储空间较小的设备上不建议记录日志，万一把空间占满了会比较麻烦）
+log_path = None
 # 日志文件的缓冲区大小
 log_buffer_size = 2048

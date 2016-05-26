@@ -46,7 +46,7 @@ printset = set(string.printable) - set(["\t", "\r", "\n", "\x0b", "\x0c"])
 
 class Logger:
     def __init__(self, log_file_path, ignore_debug=True, buffer_size=0):
-        self.logfile = open(log_file_path, "a", buffer_size)
+        self.logfile = open(log_file_path, "a", buffer_size) if log_file_path is not None else None
         self.ignore_debug = ignore_debug
 
     def _log(self, msg, level):
@@ -57,7 +57,9 @@ class Logger:
         msg = "".join(c if c in printset else '\\x' + binascii.b2a_hex(c) for c in msg)
         log_content = "[{}][{}] {}\n".format(level, datetime.datetime.now().strftime("%m-%d %H:%M:%S %f"), msg)
 
-        self.logfile.write(log_content)
+        if self.logfile is not None:
+            self.logfile.write(log_content)
+
         if level == ERROR:
             sys.stderr.write(log_content)
         else:
@@ -73,4 +75,5 @@ class Logger:
         self._log(msg, ERROR)
 
     def flush(self):
-        self.logfile.flush()
+        if self.logfile is not None:
+            self.logfile.flush()
