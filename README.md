@@ -25,7 +25,26 @@
 ## 使用方法
 把 config.default.py 复制一份，更名为 config.py，修改其中的参数值  
 执行 `python rightdns.py`，现在此脚本就成了一个运行在指定端口上的 DNS 服务  
-接下来只要把本机的 DNS 请求指向它即可  
+接下来只要把本机的 DNS 请求指向它即可
+
+### 在 openwrt 中使用
+将 rightdns 目录复制到 openwrt 的 /root 目录下
+把 /root/rightdns/rightdns.init 复制并重命名成 /etc/init.d/rightdns
+执行 `/etc/init.d/rightdns start` 开始运行
+执行 `/etc/init.d/rightdns enable` 以使其能在 openwrt 开机时自动开始运行
+
+可以让此脚本作为 dnsmasq 的上级服务器
+修改 `/etc/dnsmasq.conf`，设置如下几行：
+```
+no-resolv
+server=127.0.0.1#9999
+```
+（9999 是 config.py 里设置的端口号）
+执行 `/etc/init.d/dnsmasq restart` 重启 dnsmasq
+
+因为此脚本解析速度相对直接解析会慢一点，建议加大 dnsmasq 的缓存，以尽量减少重复解析
+在 `/etc/dnsmasq.conf` 中加一句 `cache-size=1000` 即可
+
 
 ## 鸣谢
 daemon.py 来自 https://github.com/serverdensity/python-daemon
