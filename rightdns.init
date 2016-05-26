@@ -1,0 +1,24 @@
+#!/bin/sh /etc/rc.common
+#
+# Copyright (C) 2015 OpenWrt-dist
+# Copyright (C) 2015 anjianshi <anjianshi@gmail.com>
+#
+# https://wiki.openwrt.org/inbox/procd-init-scripts
+#
+# rightdns 的 OpenWrt service 脚本
+# 此脚本假设 rightdns.py 放在 /root/rightdns 目录下，如果不是，请修改对应的代码
+# todo: 以后可以考虑把日志输出到 OpenWrt 的系统日志里
+
+USE_PROCD=1
+START=58    # start before dnsmasq
+
+start_service() {
+  procd_open_instance
+  # run 参数很重要， procd 要求目标程序要以 foreground
+  procd_set_param command /root/rightdns/rightdns.py run
+
+  # respawn automatically if something died, be careful if you have an alternative process supervisor
+  # if process dies sooner than respawn_threshold, it is considered crashed and after 5 retries the service is stopped
+  procd_set_param respawn ${respawn_threshold:-3600} ${respawn_timeout:-5} ${respawn_retry:-5}
+  procd_close_instance
+}
