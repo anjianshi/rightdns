@@ -144,7 +144,7 @@ if __name__ == "__main__":
     daemon = DNSDaemon(base + "/dns.pid")
 
     action = "start"
-    for act_name in ["start", "stop", "restart", "run"]:    # 'run' is the forgegrand mode
+    for act_name in ["start", "stop", "restart", "run"]:    # 'run' is the foreground mode
         if act_name in sys.argv:
             action = act_name
             break
