@@ -14,7 +14,7 @@ START=58    # start before dnsmasq
 
 start_service() {
   procd_open_instance
-  # run 参数很重要， procd 要求目标程序要以 foreground
+  # run 参数很重要， procd 要求目标程序以 foreground 形式运行
   procd_set_param command /root/rightdns/rightdns.py run
 
   # respawn automatically if something died, be careful if you have an alternative process supervisor
