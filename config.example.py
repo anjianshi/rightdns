@@ -8,7 +8,8 @@ safe_dns_ip = None
 safe_dns_port = 53
 
 # 本地渠道的 DNS 服务器（必填）
-normal_dns_ip = None
+# 默认设置的是 DNSPOD 的 public DNS
+normal_dns_ip = "119.29.29.29"
 normal_dns_port = 53
 
 # 伪造渠道的 IP 地址
