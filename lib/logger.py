@@ -1,39 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from threading import Thread
-import socket
-import re
 import string
 import binascii
 import sys
 import datetime
-
-
-def _async(f):
-    """应用了此装饰器的函数，其内容会被异步执行"""
-    def wrapper(*args, **kwargs):
-        thr = Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-    return wrapper
-
-
-def udp_send(target, content):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.sendto(content, target)
-    return s
-
-
-def extract_domain(dns_packets, multiple=False):
-    domain_pattern = r'(?:\w|-)+(?:[^\w\-](?:\w|-)+)+'
-
-    def sub(content):
-        return re.sub(r'[^\w\-]', '.', content)
-
-    if multiple:
-        return map(sub, re.findall(domain_pattern, dns_packets))
-    else:
-        match = re.search(domain_pattern, dns_packets)
-        return sub(match.group()) if match else None
 
 
 # logging level
@@ -77,3 +47,9 @@ class Logger:
     def flush(self):
         if self.logfile is not None:
             self.logfile.flush()
+
+
+# ========================================
+
+from config import config
+logger = Logger(config.log_path, not config.debug, config.log_buffer_size)

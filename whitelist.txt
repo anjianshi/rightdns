@@ -1,8 +1,0 @@
-google
-gstatic
-youtube
-wikipedia
-
-# cdn
-edgecast
-cachefly

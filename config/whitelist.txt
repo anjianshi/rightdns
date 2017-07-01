@@ -1,0 +1,16 @@
+google
+gstatic
+youtube
+wikipedia
+xhacker
+facebook
+instagram
+
+
+voachinese
+voanews
+secretchina
+
+# cdn
+edgecast
+cachefly

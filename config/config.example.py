@@ -3,14 +3,18 @@
 # 是否以调试模式运行（会输出更多信息）
 debug = False
 
-# 安全渠道的 DNS 服务器（必填）
-safe_dns_ip = None
-safe_dns_port = 53
+# rightdns 监听的端口
+port = 5302
 
 # 本地渠道的 DNS 服务器（必填）
 # 默认设置的是 DNSPOD 的 public DNS
 normal_dns_ip = "119.29.29.29"
 normal_dns_port = 53
+
+# dns.google.com 域名的 IP 地址
+dns_google_com_ip = "216.58.200.46"
+# 此工具会在内部另建一个代理 Google HTTPS DNS 服务的 DNS 服务器，需要给它也指定一个端口
+google_proxy_port = 5033
 
 # 伪造渠道的 IP 地址
 fake_dns_ip = '8.8.8.9'
