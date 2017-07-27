@@ -6,7 +6,7 @@ import json
 
 from config import config
 from dns import domain_to_dns_name, extract_domain
-from bits import bits2str, int2str
+from bits import bits2str, int2str, int2bits
 from udp import create_udp_server
 
 
@@ -41,13 +41,13 @@ def format_google_response(msg_id, google_resp):
     res1 = '0'
     res2 = '0'
     res3 = '0'
-    RCODE = '0000'
+    RCODE = int2bits(gr["Status"], 4)
     header_part2 = bits2str(''.join([QR, OPCODE, AA, TC, RD, RA, res1, res2, res3, RCODE]))
 
     QDCOUNT = int2str(1)
-    ANCOUNT = int2str(len(gr["Answer"]))
-    NSCOUNT = int2str(0)
-    ARCOUNT = int2str(0)
+    ANCOUNT = int2str(len(gr.get("Answer", [])))
+    NSCOUNT = int2str(len(gr.get("Authority", [])))     # 已知解析 .in-addr.arpa 类域名时会出现这部分内容
+    ARCOUNT = int2str(len(gr.get("Additional", [])))
 
     header = msg_id + header_part2 + QDCOUNT + ANCOUNT + NSCOUNT + ARCOUNT
 
@@ -58,29 +58,43 @@ def format_google_response(msg_id, google_resp):
 
     question = QNAME + QTYPE + QCLASS
 
-    # ===== answer =====
-    answers = ''
+    # ===== response =====
+    resp = ''
 
-    for ga in gr["Answer"]:
-        NAME = domain_to_dns_name(ga["name"].encode())
-        TYPE = int2str(ga["type"])
-        CLASS = int2str(1)
-        TTL = int2str(ga["TTL"], 32)
+    for resp_type in ["Answer", "Authority", "Additional"]:
+        if resp_type not in gr:
+            continue
 
-        if ga["type"] == 1:     # A 记录
-            RDLENGTH = int2str(4)
-            RDATA = ''
-            for ip_part in ga["data"].split("."):
-                RDATA += chr(int(ip_part))
-        elif ga["type"] == 5:    # CNAME 记录 （例如 www.adobe.com 的解析结果里就有）
-            RDATA = domain_to_dns_name(ga["data"].encode())
-            RDLENGTH = int2str(len(RDATA))
-        else:
-            raise Exception('unknown answer type: {}'.format(ga["type"]))
+        for i in gr[resp_type]:
+            NAME = domain_to_dns_name(i["name"].encode())
+            TYPE = int2str(i["type"])
+            CLASS = int2str(1)
+            TTL = int2str(i["TTL"], 32)
 
-        answers += NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA
+            if i["type"] == 1:     # A 记录
+                RDLENGTH = int2str(4)
+                RDATA = ''
+                for ip_part in i["data"].split("."):
+                    RDATA += chr(int(ip_part))
+            elif i["type"] == 5:    # CNAME 记录（例如 www.adobe.com 的解析结果里就有）
+                RDATA = domain_to_dns_name(i["data"].encode())
+                RDLENGTH = int2str(len(RDATA))
+            elif i["type"] == 6:    # SOA 记录（例如 .in-addr.arpa 类域名的解析结果里就有）
+                primary_ns, admin_mb, \
+                    serial_number, refresh_interval, \
+                    retry_interval, expiratio_limit, ttl = i["data"].encode().split(" ")
 
-    return header + question + answers
+                RDATA = domain_to_dns_name(primary_ns) + domain_to_dns_name(admin_mb) \
+                    + int2str(int(serial_number), 32) + int2str(int(refresh_interval), 32) \
+                    + int2str(int(retry_interval), 32) + int2str(int(expiratio_limit), 32) \
+                    + int2str(int(ttl), 32)
+                RDLENGTH = int2str(len(RDATA))
+            else:
+                raise Exception('unknown answer type: {}'.format(i["type"]))
+
+            resp += (NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA)
+
+    return header + question + resp
 
 
 def request_google_https_dns(domain):
