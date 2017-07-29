@@ -59,7 +59,12 @@ def rightdns_resolve(req):
         spent_seconds = (datetime.now() - poll_started).total_seconds()
         if len(prepared_socks) == 0 and config.resolve_timeout > 0 and spent_seconds > (config.resolve_timeout / 1000.0):
             info("timeout. safe_resp: {}, normal_resp: {}".format(safe_resp is not None, normal_resp is not None))
-            return  # 超时，结束此次解析
+
+            # 超时，若当前已经取得 safe_resp（即超时是因为没能取得 normal_resp），则返回 safe_resp；否则结束此次解析
+            if safe_resp:
+                poisoned = True
+            else:
+                return
 
         if fake_req in prepared_socks:
             # 如果在其他检查项完成前，从 fake_req 处收到了响应，则立刻将域名判定为已被污染
