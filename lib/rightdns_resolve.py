@@ -9,6 +9,7 @@ from logger import logger
 from dns import decode_msg_id, extract_domain
 from udp import udp_send
 from poll import SocksPoll
+from cache import add_cache, get_cache
 
 
 def rightdns_resolve(req):
@@ -19,12 +20,6 @@ def rightdns_resolve(req):
     id = decode_msg_id(req)
     domain = extract_domain(req)
 
-    poisoned = False    # 是否已判定域名被污染
-
-    normal_resp = None
-    safe_resp = None
-    response = None     # 输出给客户端的 reponse
-
     # ===== helper functions =====
 
     def info(msg):
@@ -33,7 +28,20 @@ def rightdns_resolve(req):
     def debug(msg):
         logger.debug("({}:{}) {}".format(id, domain, msg))
 
-    # ===== start resolve =====
+    # ===== 检查缓存 =====
+
+    cache = get_cache(domain, req[:2])
+    if cache:
+        info("resolved from cache")
+        return cache
+
+    # ===== execute resolve =====
+
+    poisoned = False    # 是否已判定域名被污染
+
+    normal_resp = None
+    safe_resp = None
+    response = None     # 输出给客户端的 reponse
 
     poll = SocksPoll.create()
 
@@ -110,4 +118,5 @@ def rightdns_resolve(req):
             break
 
     info("resolved with {} response".format("safe" if poisoned else "normal"))
+    add_cache(domain, response)
     return response
