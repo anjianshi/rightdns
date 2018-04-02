@@ -15,6 +15,7 @@ resilio
 
 # cdn
 edgecast
+ecdns
 cachefly
 
 # chnroute

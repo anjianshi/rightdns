@@ -11,7 +11,7 @@ def read_whitelist():
     base = abspath(join(dirname(__file__), '../config'))
 
     for filename in ['whitelist.default.txt', 'whitelist.txt']:
-        filepath = base + filename
+        filepath = base + '/' + filename
         if isfile(filepath):
             logger.info("read whitelist from " + filepath)
             with open(filepath) as f:
