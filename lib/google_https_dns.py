@@ -76,7 +76,7 @@ def format_google_response(msg_id, google_resp):
                 RDATA = ''
                 for ip_part in i["data"].split("."):
                     RDATA += chr(int(ip_part))
-            elif i["type"] == 5:    # CNAME 记录（例如 www.adobe.com 的解析结果里就有）
+            elif i["type"] == 5 or i["type"] == 39:    # CNAME 和 DNAME 记录（例如 www.adobe.com 的解析结果里有 CNAME 记录；api.smoot.apple.cn 的解析结果里有 DNAME 记录）
                 RDATA = domain_to_dns_name(i["data"].encode())
                 RDLENGTH = int2str(len(RDATA))
             elif i["type"] == 6:    # SOA 记录（例如 .in-addr.arpa 类域名的解析结果里就有）
