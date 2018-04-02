@@ -11,8 +11,16 @@ port = 5302
 normal_dns_ip = "119.29.29.29"
 normal_dns_port = 53
 
+# 是否使用 Google 的 DNS-Over-HTTPS 来获取安全的解析结果。建议在翻墙网络不支持转发 UDP 请求时开启。
+use_https_dns = False
+
+# 安全渠道的 DNS 服务器，use_https_dns 为 False 时必填
+safe_dns_ip = "8.8.8.8"
+safe_dns_port = 53
+
+# Google DNS-Over-HTTPS 相关配置，use_https_dns 为 True 时必填
 # dns.google.com 域名的 IP 地址
-dns_google_com_ip = "216.58.200.46"
+dns_google_com_ip = "216.58.196.238"
 # 此工具会在内部另建一个代理 Google HTTPS DNS 服务的 DNS 服务器，需要给它也指定一个端口
 google_proxy_port = 5033
 

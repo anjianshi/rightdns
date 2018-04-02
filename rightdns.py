@@ -15,7 +15,8 @@ from lib.async_utils import async_run
 
 class DNSDaemon(Daemon):
     def run(self):
-        async_run(start_google_https_dns_proxy_server)
+        if config.use_https_dns:
+            async_run(start_google_https_dns_proxy_server)
 
         logger.info("listening DNS request on {}".format(config.port))
         create_udp_server(config.port, self.resolve)

@@ -2,6 +2,7 @@
 *~
 *.pyc
 config.py
+whitelist.txt
 *.log
 *.pid
 test.py

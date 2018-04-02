@@ -45,7 +45,7 @@ def rightdns_resolve(req):
 
     poll = SocksPoll.create()
 
-    safe_req = udp_send(('127.0.0.1', config.google_proxy_port), req)
+    safe_req = udp_send(('127.0.0.1', config.google_proxy_port), req) if config.use_https_dns else udp_send(config.safe_dns_ip, config.safe_dns_port)
     poll.register(safe_req)
 
     # 若待解析的域名与白名单匹配，则无需再获取 fake / normal resp

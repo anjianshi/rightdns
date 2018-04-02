@@ -4,13 +4,18 @@ youtube
 wikipedia
 xhacker
 facebook
+fbcdn
 instagram
-
-
-voachinese
-voanews
-secretchina
+openwrt
+bintray
+amazon
+twitter
+twimg
+resilio
 
 # cdn
 edgecast
 cachefly
+
+# chnroute
+ftp.apnic.net
