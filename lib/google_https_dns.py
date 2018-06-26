@@ -106,9 +106,8 @@ def request_google_https_dns(domain):
     """
 
     # 因为无法确保当前环境下能够成功解析出 DNS-Over-HTTPS 服务的 IP，因此使用预先准备好的 IP 地址
-    # 这样做的缺点是必须关闭 HTTPS 证书的域名检查。方法来自：https://stackoverflow.com/a/34723527/2815178
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
+    # 这样做的缺点是必须关闭 HTTPS 证书的域名检查。方法来自：https://stackoverflow.com/a/28052583/2815178
+    ssl_context = ssl._create_unverified_context()
     conn = httplib.HTTPSConnection(config.dns_google_com_ip, context=ssl_context)
     conn.request('GET', '/resolve?name=' + domain, None, {"Host": "dns.google.com"})
     raw_resp = conn.getresponse().read()
