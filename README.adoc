@@ -50,6 +50,27 @@ server=127.0.0.1#9999
 因为此脚本解析速度相对直接解析会慢一点，建议加大 dnsmasq 的缓存，以尽量减少重复解析 +
 在 `/etc/dnsmasq.conf` 中加一句 `cache-size=1000` 即可
 
+==== 另一个使用方式：用 rightdns 代替 dnsmasq
+这种方式少了一部交接过程，也减少了出问题的可能性。
+不过问题在于，dnsmasq 在 openwrt 里除了是 dns server，还是 dhcp server，
+因此还要用另一个东西代替 dnsmasq 的 dhcp 部分。这里选择了 odhcpd
+
+DNS 部分，配置 rightdns，让它运行在 53 端口且开机启动
+
+DHCP 部分：
+```
+opkg remove dnsmasq odhcpd-ipv6only
+opkg install odhcpd
+```
+编辑 `/etc/config/dhcp`
+把 `config odhcpd 'odhcpd'` 下的 `maindhcp` 的值改为 1
+然后在 `option dhcpv6 'server'` 下面加上一行 `option dhcpv4 'server'`
+```
+/etc/init.d/odhcpd restart
+```
+
+参考资料： https://github.com/openwrt/odhcpd
+
 
 == 鸣谢
 daemon.py 来自 https://github.com/serverdensity/python-daemon
