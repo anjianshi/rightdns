@@ -1,5 +1,6 @@
 google
 gstatic
+github
 youtube
 wikipedia
 xhacker
@@ -12,6 +13,7 @@ amazon
 twitter
 twimg
 resilio
+recaptcha
 
 # cdn
 edgecast
