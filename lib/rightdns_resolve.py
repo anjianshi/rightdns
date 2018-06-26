@@ -32,7 +32,7 @@ def rightdns_resolve(req):
 
     cache = get_cache(domain, req[:2])
     if cache:
-        info("resolved from cache")
+        info("resolved from cache: {}".format(cache))
         return cache
 
     # ===== execute resolve =====
