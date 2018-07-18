@@ -62,8 +62,8 @@ DHCP 部分：
 opkg remove dnsmasq odhcpd-ipv6only
 opkg install odhcpd
 ```
-编辑 `/etc/config/dhcp`
-把 `config odhcpd 'odhcpd'` 下的 `maindhcp` 的值改为 1
+编辑 `/etc/config/dhcp`  
+把 `config odhcpd 'odhcpd'` 下的 `maindhcp` 的值改为 1  
 然后在 `option dhcpv6 'server'` 下面加上一行 `option dhcpv4 'server'`
 ```
 /etc/init.d/odhcpd restart
